@@ -770,9 +770,30 @@ function generate() {
 
   for (let d = 1; d <= effectiveDays; d++) {
     const startIdx = pageIndex;
-    // How many pages for this day?
-    const targetEnd = Math.round((d / effectiveDays) * totalPages);
-    const endIdx = Math.min(targetEnd - 1, totalPages - 1);
+    if (startIdx >= totalPages) break;
+
+    // Target end based on even distribution; ensure at least 1 page for this day
+    let endIdx = Math.max(
+      startIdx,
+      Math.min(Math.round((d / effectiveDays) * totalPages) - 1, totalPages - 1)
+    );
+
+    // If only 1 page of the current surah remains after the split, absorb it
+    // so we don't carry a tiny tail into the next day
+    if (endIdx < totalPages - 1) {
+      const splitPage  = pages[endIdx];
+      const surahInfo  = getLatestSurahOnOrBefore(splitPage);
+      const surahEndPg = surahInfo.surah < 114
+        ? SURAH_START_PAGES[surahInfo.surah + 1] - 1
+        : TOTAL_PAGES;
+      // Count how many pages of this surah still remain in our set after endIdx
+      let tail = 0;
+      for (let j = endIdx + 1; j < totalPages; j++) {
+        if (pages[j] <= surahEndPg) tail++;
+        else break;
+      }
+      if (tail === 1) endIdx = Math.min(endIdx + 1, totalPages - 1);
+    }
 
     const pagesSlice = pages.slice(startIdx, endIdx + 1);
     const rawSegs = getSegments(pagesSlice);
@@ -875,7 +896,11 @@ function getSurahAyahAtEnd(page) {
 
 function formatRef(surah, ayah) {
   const name = SURAH_NAMES[surah - 1];
-  const ayahStr = ayah > 1 ? ` Āyah ${ayah}` : '';
+  const total = AYAH_COUNTS[surah - 1];
+  let ayahStr;
+  if (ayah <= 1)        ayahStr = ' Āyah 1 (Start)';
+  else if (ayah >= total) ayahStr = ` Āyah ${ayah} (End)`;
+  else                    ayahStr = ` Āyah ${ayah}`;
   return { name, ayah: ayahStr };
 }
 
