@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quran Revision Schedule</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #2d7a4f;
+    --green-light: #3a9e65;
+    --green-pale: #e8f5ee;
+    --green-border: #b2ddc4;
+    --white: #ffffff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-800: #1f2937;
+    --red: #dc2626;
+    --red-pale: #fef2f2;
+    --orange: #d97706;
+    --orange-pale: #fffbeb;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+    --radius: 10px;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-800);
+    min-height: 100vh;
+    padding: 20px 16px 60px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+
+  header .logo {
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--green);
+  }
+
+  header p {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    max-width: 700px;
+    margin: 0 auto 20px;
+  }
+
+  .card h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--green);
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--green-pale);
+  }
+
+  .form-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .form-group.full { flex: 1 1 100%; }
+
+  label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    padding: 9px 12px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 7px;
+    font-size: 0.95rem;
+    color: var(--gray-800);
+    background: var(--white);
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--green-light);
+    box-shadow: 0 0 0 3px rgba(58,158,101,0.12);
+  }
+
+  .range-block {
+    background: var(--green-pale);
+    border: 1.5px solid var(--green-border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .range-block .range-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+
+  .range-half {
+    background: var(--white);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .range-half:last-child { margin-bottom: 0; }
+
+  .range-half .half-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .remove-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .remove-btn:hover { color: var(--red); background: var(--red-pale); }
+
+  .add-range-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 2px dashed var(--green-border);
+    color: var(--green);
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    justify-content: center;
+    margin-top: 4px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .add-range-btn:hover { background: var(--green-pale); border-color: var(--green); }
+
+  .generate-btn {
+    display: block;
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    background: var(--green);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    padding: 14px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    box-shadow: var(--shadow);
+    transition: background 0.15s, transform 0.1s;
+  }
+
+  .generate-btn:hover { background: var(--green-light); }
+  .generate-btn:active { transform: scale(0.99); }
+
+  #output { display: none; }
+
+  .summary-banner {
+    background: var(--green);
+    color: var(--white);
+    border-radius: var(--radius);
+    padding: 18px 24px;
+    max-width: 700px;
+    margin: 20px auto 0;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .summary-banner .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .summary-banner .stat-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .summary-banner .stat-label {
+    font-size: 0.78rem;
+    opacity: 0.85;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .summary-banner .divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.3);
+  }
+
+  .warning-box {
+    background: var(--orange-pale);
+    border: 1.5px solid #fcd34d;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--orange);
+    font-size: 0.9rem;
+    max-width: 700px;
+    margin: 12px auto 0;
+    font-weight: 500;
+  }
+
+  .error-box {
+    background: var(--red-pale);
+    border: 1.5px solid #fca5a5;
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--red);
+    font-size: 0.9rem;
+    max-width: 700px;
+    margin: 12px auto 0;
+    font-weight: 500;
+  }
+
+  .copy-bar {
+    display: flex;
+    gap: 10px;
+    max-width: 700px;
+    margin: 14px auto 0;
+  }
+
+  .copy-btn, .print-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .copy-btn { background: var(--green-pale); color: var(--green); border: 1.5px solid var(--green-border); }
+  .print-btn { background: var(--gray-100); color: var(--gray-600); border: 1.5px solid var(--gray-200); }
+  .copy-btn:hover { background: var(--green-border); }
+  .print-btn:hover { background: var(--gray-200); }
+
+  .schedule-grid {
+    max-width: 700px;
+    margin: 14px auto 0;
+    display: grid;
+    gap: 10px;
+  }
+
+  .day-card {
+    background: var(--white);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    padding: 16px 20px;
+    border-left: 4px solid var(--green);
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .day-num {
+    background: var(--green);
+    color: var(--white);
+    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .day-details { min-width: 0; }
+
+  .day-detail-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .day-detail-row:last-child { margin-bottom: 0; }
+
+  .detail-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--green);
+    min-width: 28px;
+  }
+
+  .detail-tag.end { color: var(--gray-400); }
+
+  .detail-main {
+    font-weight: 600;
+    color: var(--gray-800);
+  }
+
+  .detail-page {
+    color: var(--gray-400);
+    font-size: 0.82rem;
+  }
+
+  .pages-pill {
+    margin-left: auto;
+    background: var(--green-pale);
+    color: var(--green);
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .seg-sep {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gray-400);
+    margin: 6px 0 5px;
+    padding-top: 6px;
+    border-top: 1px dashed var(--gray-200);
+  }
+
+  @media (max-width: 480px) {
+    .day-card { grid-template-columns: 40px 1fr; gap: 8px; padding: 12px 14px; }
+    .day-num { width: 36px; height: 36px; font-size: 0.85rem; }
+    .summary-banner { gap: 10px; }
+    .summary-banner .divider { display: none; }
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .card, .generate-btn, .copy-bar, header { display: none !important; }
+    #output { display: block !important; }
+    .summary-banner { box-shadow: none; border: 2px solid var(--green); }
+    .day-card { box-shadow: none; border: 1px solid var(--gray-200); break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📖</div>
+  <h1>Quran Revision Schedule</h1>
+  <p>Plan your revision with precision — page by page</p>
+</header>
+
+<div class="card">
+  <h2>Student Details</h2>
+  <div class="form-row">
+    <div class="form-group full">
+      <label for="studentName">Student Name</label>
+      <input type="text" id="studentName" placeholder="e.g. Abdullah Ahmed">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="numDays">Days to Complete Revision</label>
+      <input type="number" id="numDays" min="1" max="365" placeholder="e.g. 30">
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Memorised Ranges</h2>
+  <div id="rangesContainer"></div>
+  <button class="add-range-btn" onclick="addRange()">＋ Add Another Range</button>
+</div>
+
+<button class="generate-btn" onclick="generate()">Generate Schedule</button>
+
+<div id="output">
+  <div id="summaryBanner"></div>
+  <div id="warningBox"></div>
+  <div class="copy-bar">
+    <button class="copy-btn" onclick="copySchedule()">📋 Copy to Clipboard</button>
+    <button class="print-btn" onclick="window.print()">🖨 Print</button>
+  </div>
+  <div class="schedule-grid" id="scheduleGrid"></div>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+
+const SURAH_NAMES = [
+  "Al-Fātiḥah","Al-Baqarah","Āl ʿImrān","An-Nisāʾ","Al-Māʾidah",
+  "Al-Anʿām","Al-Aʿrāf","Al-Anfāl","At-Tawbah","Yūnus",
+  "Hūd","Yūsuf","Ar-Raʿd","Ibrāhīm","Al-Ḥijr",
+  "An-Naḥl","Al-Isrāʾ","Al-Kahf","Maryam","Ṭāhā",
+  "Al-Anbiyāʾ","Al-Ḥajj","Al-Muʾminūn","An-Nūr","Al-Furqān",
+  "Ash-Shuʿarāʾ","An-Naml","Al-Qaṣaṣ","Al-ʿAnkabūt","Ar-Rūm",
+  "Luqmān","As-Sajdah","Al-Aḥzāb","Sabaʾ","Fāṭir",
+  "Yā-Sīn","Aṣ-Ṣāffāt","Ṣād","Az-Zumar","Ghāfir",
+  "Fuṣṣilat","Ash-Shūrā","Az-Zukhruf","Ad-Dukhān","Al-Jāthiyah",
+  "Al-Aḥqāf","Muḥammad","Al-Fatḥ","Al-Ḥujurāt","Qāf",
+  "Adh-Dhāriyāt","Aṭ-Ṭūr","An-Najm","Al-Qamar","Ar-Raḥmān",
+  "Al-Wāqiʿah","Al-Ḥadīd","Al-Mujādilah","Al-Ḥashr","Al-Mumtaḥanah",
+  "Aṣ-Ṣaff","Al-Jumuʿah","Al-Munāfiqūn","At-Taghābun","Aṭ-Ṭalāq",
+  "At-Taḥrīm","Al-Mulk","Al-Qalam","Al-Ḥāqqah","Al-Maʿārij",
+  "Nūḥ","Al-Jinn","Al-Muzzammil","Al-Muddaththir","Al-Qiyāmah",
+  "Al-Insān","Al-Mursalāt","An-Nabaʾ","An-Nāziʿāt","ʿAbasa",
+  "At-Takwīr","Al-Infiṭār","Al-Muṭaffifīn","Al-Inshiqāq","Al-Burūj",
+  "Aṭ-Ṭāriq","Al-Aʿlā","Al-Ghāshiyah","Al-Fajr","Al-Balad",
+  "Ash-Shams","Al-Layl","Aḍ-Ḍuḥā","Ash-Sharḥ","At-Tīn",
+  "Al-ʿAlaq","Al-Qadr","Al-Bayyinah","Az-Zalzalah","Al-ʿĀdiyāt",
+  "Al-Qāriʿah","At-Takāthur","Al-ʿAṣr","Al-Humazah","Al-Fīl",
+  "Quraysh","Al-Māʿūn","Al-Kawthar","Al-Kāfirūn","An-Naṣr",
+  "Al-Masad","Al-Ikhlāṣ","Al-Falaq","An-Nās"
+];
+
+const AYAH_COUNTS = [
+  7,286,200,176,120,165,206,75,129,109,   // 1–10
+  123,111,43,52,99,128,111,110,98,135,    // 11–20
+  112,78,118,64,77,227,93,88,69,60,       // 21–30
+  34,30,73,54,45,83,182,88,75,85,         // 31–40
+  54,53,89,59,37,35,38,29,18,45,          // 41–50
+  60,49,62,55,78,96,29,22,24,13,          // 51–60
+  14,11,11,18,12,12,30,52,52,44,          // 61–70
+  28,28,20,56,40,31,50,40,46,42,          // 71–80
+  29,19,36,25,22,17,19,26,30,20,          // 81–90
+  15,21,11,8,8,19,5,8,8,11,              // 91–100
+  11,8,3,9,5,4,7,3,6,3,                  // 101–110
+  5,4,5,6                                 // 111–114
+];
+
+// Surah → first page (from KFGQPC V4 15-line Medina Hafs mushaf)
+const SURAH_START_PAGES = {
+  1:1,2:2,3:50,4:77,5:106,6:128,7:151,8:177,9:187,10:208,
+  11:221,12:235,13:249,14:255,15:262,16:267,17:282,18:293,
+  19:305,20:312,21:322,22:332,23:342,24:350,25:359,26:367,
+  27:377,28:385,29:396,30:404,31:411,32:415,33:418,34:428,
+  35:434,36:440,37:446,38:453,39:458,40:467,41:477,42:483,
+  43:489,44:496,45:499,46:502,47:507,48:511,49:515,50:518,
+  51:520,52:523,53:526,54:528,55:531,56:534,57:537,58:542,
+  59:545,60:549,61:551,62:553,63:554,64:556,65:558,66:560,
+  67:562,68:564,69:566,70:568,71:570,72:572,73:574,74:575,
+  75:577,76:578,77:580,78:582,79:583,80:585,81:586,82:587,
+  83:587,84:589,85:590,86:591,87:591,88:592,89:593,90:594,
+  91:595,92:595,93:596,94:596,95:597,96:597,97:598,98:598,
+  99:599,100:599,101:600,102:600,103:601,104:601,105:601,
+  106:602,107:602,108:602,109:603,110:603,111:603,112:604,
+  113:604,114:604
+};
+
+const TOTAL_PAGES = 604;
+
+// ─── PAGE LOOKUP ─────────────────────────────────────────────────────────────
+
+// Build a sorted list of surah start pages once
+const SURAH_LIST = Object.entries(SURAH_START_PAGES)
+  .map(([s, p]) => ({ surah: +s, page: p }))
+  .sort((a, b) => a.surah - b.surah);
+
+function getPageForAyah(surah, ayah) {
+  // We don't have per-ayah page data beyond the surah starts.
+  // Strategy: find which page the ayah falls on by proportional distribution
+  // within the surah's page range.
+  const s = +surah;
+  const totalAyahs = AYAH_COUNTS[s - 1];
+  const startPage = SURAH_START_PAGES[s];
+  const endPage = s < 114 ? SURAH_START_PAGES[s + 1] - 1 : TOTAL_PAGES;
+  const surahPages = endPage - startPage + 1;
+
+  // Proportion: which page does this ayah approximately fall on?
+  const frac = (ayah - 1) / totalAyahs;
+  const page = startPage + Math.floor(frac * surahPages);
+  return Math.min(page, endPage);
+}
+
+// Given a page number, find which surah:ayah is at the START of that page.
+// When multiple surahs share the same start page, returns the lowest-numbered one.
+function getSurahAyahForPage(page) {
+  // Find the latest (highest-numbered) surah starting at or before this page
+  let latest = null;
+  for (let i = SURAH_LIST.length - 1; i >= 0; i--) {
+    if (SURAH_LIST[i].page <= page) { latest = SURAH_LIST[i]; break; }
+  }
+  if (!latest) return { surah: 1, ayah: 1 };
+
+  // If a surah begins exactly on this page, return the FIRST such surah (lowest number)
+  if (latest.page === page) {
+    for (let i = 0; i < SURAH_LIST.length; i++) {
+      if (SURAH_LIST[i].page === page) return { surah: SURAH_LIST[i].surah, ayah: 1 };
+    }
+  }
+
+  // Surah started before this page — interpolate approximate ayah
+  const s = latest.surah;
+  const startPage = latest.page;
+  const endPage = s < 114 ? SURAH_START_PAGES[s + 1] - 1 : TOTAL_PAGES;
+  const surahPages = endPage - startPage + 1;
+  const totalAyahs = AYAH_COUNTS[s - 1];
+  const frac = (page - startPage) / surahPages;
+  const ayah = Math.min(Math.ceil(frac * totalAyahs) + 1, totalAyahs);
+  return { surah: s, ayah };
+}
+
+// Find the latest (highest-numbered) surah starting at or before page — used for end-of-page
+function getLatestSurahOnOrBefore(page) {
+  for (let i = SURAH_LIST.length - 1; i >= 0; i--) {
+    if (SURAH_LIST[i].page <= page) return SURAH_LIST[i];
+  }
+  return SURAH_LIST[0];
+}
+
+// ─── DOM HELPERS ─────────────────────────────────────────────────────────────
+
+let rangeCount = 0;
+
+function makeSurahOptions(selectedVal) {
+  return SURAH_NAMES.map((name, i) => {
+    const n = i + 1;
+    const sel = n === selectedVal ? ' selected' : '';
+    return `<option value="${n}"${sel}>${n}. ${name}</option>`;
+  }).join('');
+}
+
+function makeAyahOptions(surahNum, selectedAyah) {
+  const count = AYAH_COUNTS[surahNum - 1];
+  let html = '';
+  for (let a = 1; a <= count; a++) {
+    html += `<option value="${a}"${a === selectedAyah ? ' selected' : ''}>${a}</option>`;
+  }
+  return html;
+}
+
+function rebuildAyahDropdown(selectEl, surahNum, selectedAyah) {
+  selectEl.innerHTML = makeAyahOptions(surahNum, selectedAyah);
+}
+
+function addRange(fromSurah, fromAyah, toSurah, toAyah) {
+  rangeCount++;
+  const id = rangeCount;
+  const fSurah = fromSurah || 1;
+  const tSurah = toSurah   || 1;
+  const fAyah  = fromAyah  || 1;
+  const tAyah  = toAyah    || AYAH_COUNTS[tSurah - 1];
+
+  const div = document.createElement('div');
+  div.className = 'range-block';
+  div.id = `range-${id}`;
+  div.innerHTML = `
+    <div class="range-title">Range ${id}</div>
+    <button class="remove-btn" onclick="removeRange(${id})" title="Remove">✕</button>
+    <div class="range-half">
+      <div class="half-label">From</div>
+      <div class="form-row">
+        <div class="form-group" style="flex:2">
+          <label>Surah</label>
+          <select id="fromSurah-${id}">${makeSurahOptions(fSurah)}</select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Ayah</label>
+          <select id="fromAyah-${id}">${makeAyahOptions(fSurah, fAyah)}</select>
+        </div>
+      </div>
+    </div>
+    <div class="range-half">
+      <div class="half-label">To</div>
+      <div class="form-row">
+        <div class="form-group" style="flex:2">
+          <label>Surah</label>
+          <select id="toSurah-${id}">${makeSurahOptions(tSurah)}</select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label>Ayah</label>
+          <select id="toAyah-${id}">${makeAyahOptions(tSurah, tAyah)}</select>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('rangesContainer').appendChild(div);
+  renumberRanges();
+
+  // When surah changes, rebuild the ayah dropdown with the new surah's ayahs
+  document.getElementById(`fromSurah-${id}`).addEventListener('change', function () {
+    rebuildAyahDropdown(document.getElementById(`fromAyah-${id}`), +this.value, 1);
+  });
+  document.getElementById(`toSurah-${id}`).addEventListener('change', function () {
+    const count = AYAH_COUNTS[+this.value - 1];
+    rebuildAyahDropdown(document.getElementById(`toAyah-${id}`), +this.value, count);
+  });
+}
+
+function removeRange(id) {
+  const el = document.getElementById(`range-${id}`);
+  if (el) el.remove();
+  renumberRanges();
+}
+
+function renumberRanges() {
+  const blocks = document.querySelectorAll('.range-block');
+  blocks.forEach((b, i) => {
+    const title = b.querySelector('.range-title');
+    if (title) title.textContent = `Range ${i + 1}`;
+  });
+}
+
+// ─── SCHEDULE GENERATION ─────────────────────────────────────────────────────
+
+// Split a slice of page numbers into contiguous runs (gaps = range boundaries)
+function getSegments(pagesSlice) {
+  if (!pagesSlice.length) return [];
+  const segs = [];
+  let runStart = pagesSlice[0], runEnd = pagesSlice[0];
+  for (let i = 1; i < pagesSlice.length; i++) {
+    if (pagesSlice[i] === runEnd + 1) {
+      runEnd = pagesSlice[i];
+    } else {
+      segs.push({ startPage: runStart, endPage: runEnd });
+      runStart = pagesSlice[i];
+      runEnd   = pagesSlice[i];
+    }
+  }
+  segs.push({ startPage: runStart, endPage: runEnd });
+  return segs;
+}
+
+function getRanges() {
+  const blocks = document.querySelectorAll('.range-block');
+  const ranges = [];
+  for (const b of blocks) {
+    const id = b.id.replace('range-', '');
+    const fromS = +document.getElementById(`fromSurah-${id}`).value;
+    const fromA = +document.getElementById(`fromAyah-${id}`).value || 1;
+    const toS   = +document.getElementById(`toSurah-${id}`).value;
+    const toA   = +document.getElementById(`toAyah-${id}`).value || AYAH_COUNTS[toS - 1];
+
+    const fromPage = getPageForAyah(fromS, fromA);
+    const toPage   = getPageForAyah(toS, toA);
+
+    if (fromPage > toPage) {
+      throw new Error(`Range ${b.querySelector('.range-title').textContent}: "From" page (${fromPage}) is after "To" page (${toPage}). Please check your selection.`);
+    }
+    ranges.push({ fromS, fromA, fromPage, toS, toA, toPage });
+  }
+  return ranges;
+}
+
+function buildPageSet(ranges) {
+  // Build a sorted, deduplicated array of page numbers across all ranges
+  const set = new Set();
+  for (const r of ranges) {
+    for (let p = r.fromPage; p <= r.toPage; p++) set.add(p);
+  }
+  return Array.from(set).sort((a, b) => a - b);
+}
+
+function generate() {
+  const grid = document.getElementById('scheduleGrid');
+  const output = document.getElementById('output');
+  const summary = document.getElementById('summaryBanner');
+  const warning = document.getElementById('warningBox');
+
+  grid.innerHTML = '';
+  summary.innerHTML = '';
+  warning.innerHTML = '';
+  output.style.display = 'none';
+
+  const name = document.getElementById('studentName').value.trim();
+  const days  = +document.getElementById('numDays').value;
+
+  if (!days || days < 1) {
+    showError('Please enter the number of days.'); return;
+  }
+
+  let ranges;
+  try {
+    ranges = getRanges();
+  } catch (e) {
+    showError(e.message); return;
+  }
+
+  if (ranges.length === 0) {
+    showError('Add at least one memorised range.'); return;
+  }
+
+  const pages = buildPageSet(ranges);
+  const totalPages = pages.length;
+
+  if (totalPages === 0) {
+    showError('No pages found in the specified ranges.'); return;
+  }
+
+  let effectiveDays = days;
+  let warn = '';
+
+  if (days > totalPages) {
+    effectiveDays = totalPages;
+    warn = `⚠️ You entered ${days} days but only have ${totalPages} pages. Schedule capped at ${totalPages} days (1 page/day).`;
+  }
+
+  const pagesPerDay = totalPages / effectiveDays;
+
+  // Build day assignments
+  const schedule = [];
+  let pageIndex = 0;
+
+  for (let d = 1; d <= effectiveDays; d++) {
+    const startIdx = pageIndex;
+    // How many pages for this day?
+    const targetEnd = Math.round((d / effectiveDays) * totalPages);
+    const endIdx = Math.min(targetEnd - 1, totalPages - 1);
+
+    const pagesSlice = pages.slice(startIdx, endIdx + 1);
+    const rawSegs = getSegments(pagesSlice);
+    const segments = rawSegs.map(seg => {
+      const start = getSurahAyahForPage(seg.startPage);
+      const end   = getSurahAyahAtEnd(seg.endPage);
+      return { startPage: seg.startPage, endPage: seg.endPage,
+               startSurah: start.surah, startAyah: start.ayah,
+               endSurah: end.surah,     endAyah: end.ayah };
+    });
+
+    schedule.push({ day: d, segments, pageCount: endIdx - startIdx + 1 });
+
+    pageIndex = endIdx + 1;
+    if (pageIndex >= totalPages) break;
+  }
+
+  // Render
+  output.style.display = 'block';
+
+  summary.className = 'summary-banner';
+  summary.innerHTML = `
+    ${name ? `<div class="stat"><span class="stat-value" style="font-size:1.1rem">${esc(name)}</span><span class="stat-label">Student</span></div><div class="divider"></div>` : ''}
+    <div class="stat"><span class="stat-value">${totalPages}</span><span class="stat-label">Total Pages</span></div>
+    <div class="divider"></div>
+    <div class="stat"><span class="stat-value">${ranges.length}</span><span class="stat-label">Range${ranges.length > 1 ? 's' : ''}</span></div>
+    <div class="divider"></div>
+    <div class="stat"><span class="stat-value">${effectiveDays}</span><span class="stat-label">Days</span></div>
+    <div class="divider"></div>
+    <div class="stat"><span class="stat-value">${pagesPerDay.toFixed(1)}</span><span class="stat-label">Pages/Day</span></div>
+  `;
+
+  if (warn) {
+    warning.className = 'warning-box';
+    warning.textContent = warn;
+  }
+
+  for (const s of schedule) {
+    const card = document.createElement('div');
+    card.className = 'day-card';
+
+    const segHtml = s.segments.map((seg, i) => {
+      const sl = formatRef(seg.startSurah, seg.startAyah);
+      const el = formatRef(seg.endSurah,   seg.endAyah);
+      const pill = i === 0
+        ? `<span class="pages-pill">${s.pageCount} pg${s.pageCount !== 1 ? 's' : ''}</span>`
+        : '';
+      const sep = i > 0 ? `<div class="seg-sep">then</div>` : '';
+      return `${sep}
+        <div class="day-detail-row">
+          <span class="detail-tag">From</span>
+          <span class="detail-main">${sl.name}${sl.ayah}</span>
+          <span class="detail-page">(p. ${seg.startPage})</span>
+          ${pill}
+        </div>
+        <div class="day-detail-row">
+          <span class="detail-tag end">To</span>
+          <span class="detail-main">${el.name}${el.ayah}</span>
+          <span class="detail-page">(p. ${seg.endPage})</span>
+        </div>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div class="day-num">${s.day}</div>
+      <div class="day-details">${segHtml}</div>
+    `;
+    grid.appendChild(card);
+  }
+
+  output.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function getSurahAyahAtEnd(page) {
+  // Return the last surah:ayah on this page (approximate)
+  const next = page + 1;
+  if (next > TOTAL_PAGES) return { surah: 114, ayah: AYAH_COUNTS[113] };
+
+  // Check if a new surah starts on next page
+  for (const entry of SURAH_LIST) {
+    if (entry.page === next) {
+      // Next page starts a new surah → this page ends at last ayah of prev surah
+      const prevSurah = entry.surah - 1;
+      return { surah: prevSurah, ayah: AYAH_COUNTS[prevSurah - 1] };
+    }
+  }
+
+  // Otherwise same surah continues — find the latest surah on this page (for end position)
+  const info = getLatestSurahOnOrBefore(page);
+  const s = info.surah;
+  const startPage = SURAH_START_PAGES[s];
+  const endPage   = s < 114 ? SURAH_START_PAGES[s + 1] - 1 : TOTAL_PAGES;
+  const surahPages = endPage - startPage + 1;
+  const totalAyahs = AYAH_COUNTS[s - 1];
+
+  // Approximate end ayah for this page
+  const fracEnd = (page - startPage + 1) / surahPages;
+  const ayah = Math.min(Math.round(fracEnd * totalAyahs), totalAyahs);
+  return { surah: s, ayah };
+}
+
+function formatRef(surah, ayah) {
+  const name = SURAH_NAMES[surah - 1];
+  const ayahStr = ayah > 1 ? ` Āyah ${ayah}` : '';
+  return { name, ayah: ayahStr };
+}
+
+function showError(msg) {
+  const box = document.createElement('div');
+  box.className = 'error-box';
+  box.textContent = '⚠️ ' + msg;
+  const btn = document.querySelector('.generate-btn');
+  const existing = document.querySelector('.error-box');
+  if (existing) existing.remove();
+  btn.insertAdjacentElement('afterend', box);
+  setTimeout(() => box.remove(), 6000);
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copySchedule() {
+  const grid = document.getElementById('scheduleGrid');
+  const cards = grid.querySelectorAll('.day-card');
+  let text = '';
+
+  const name = document.getElementById('studentName').value.trim();
+  if (name) text += `Quran Revision Schedule — ${name}\n`;
+  text += '='.repeat(40) + '\n\n';
+
+  cards.forEach(card => {
+    const dayNum = card.querySelector('.day-num').textContent;
+    const pages  = card.querySelector('.pages-pill').textContent;
+    let line = `Day ${dayNum} (${pages})\n`;
+    // Walk children of day-details in order to capture seg-sep dividers
+    const details = card.querySelector('.day-details');
+    details.childNodes.forEach(node => {
+      if (node.nodeType !== 1) return;
+      if (node.classList.contains('seg-sep')) {
+        line += `  — then —\n`;
+      } else if (node.classList.contains('day-detail-row')) {
+        const tag  = node.querySelector('.detail-tag').textContent;
+        const main = node.querySelector('.detail-main').textContent;
+        const pg   = node.querySelector('.detail-page')?.textContent || '';
+        line += `  ${tag}: ${main} ${pg}\n`;
+      }
+    });
+    text += line + '\n';
+  });
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  }).catch(() => {
+    alert('Copy failed — please select and copy manually.');
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+
+// Start with one range defaulting to Juz 1 feel (Al-Fatiha → Al-Baqarah end)
+addRange(1, 1, 2, 141);
+</script>
+</body>
+</html>
